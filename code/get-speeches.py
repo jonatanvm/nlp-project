@@ -10,17 +10,19 @@ delimiter = "|", line terminator = "\n"
 output written to current directory
 
 '''
+import csv
 import os
 import re
-import csv
+
 import pandas as pd
-from langdetect import detect 
+from langdetect import detect
 
 folder = input("insert path to transcript main folder ")
 
+
 ##############################################################
 
-def getFilePaths(path, suffix = ".transcript"):
+def getFilePaths(path, suffix=".transcript"):
     '''
     Returns paths to files in subfolders with suffix
     
@@ -35,6 +37,7 @@ def getFilePaths(path, suffix = ".transcript"):
                 filelist.append(root + "/" + name)
     return filelist
 
+
 def cleanSpeaker(speakerline):
     '''
     remove party, speech type, title from speaker name
@@ -44,7 +47,7 @@ def cleanSpeaker(speakerline):
     '''
     chairpattern = re.compile(r"^.*uhemies")
     speakerline = re.sub(chairpattern, "", speakerline)
-    #if speakerline.find("uhemies") != -1:
+    # if speakerline.find("uhemies") != -1:
     #    speakerline = speakerline.split("uhemies ")[1]
 
     if speakerline.find("inisteri") != -1:
@@ -56,6 +59,7 @@ def cleanSpeaker(speakerline):
     speaker = speakerline.strip()
 
     return speaker
+
 
 def cleanText(text):
     '''
@@ -73,20 +77,19 @@ def cleanText(text):
     text = " ".join(words)
     return text
 
-##############################################################
 
 filelist = getFilePaths(folder)
 
 with open('speeches.csv', 'w') as outfile:
-    writer = csv.writer(outfile, lineterminator = '\n', delimiter = '|')
-    writer.writerows([["speaker","date", "speech"]])
+    writer = csv.writer(outfile, lineterminator='\n', delimiter='|')
+    writer.writerows([["speaker", "date", "speech"]])
 
 for file in filelist:
     date = file.split('/')[-2]
     print("File: ", file, "Date: ", date)
 
     # read transcript
-    transcript = open(file, "r", encoding = "UTF-8").read()
+    transcript = open(file, "r", encoding="UTF-8").read()
 
     speeches = transcript.split("SPEAKER: ")
 
@@ -119,13 +122,13 @@ for file in filelist:
         finnish = cleanText(finnish)
         if finnish.strip() != "":
             with open('speeches.csv', 'a') as outfile:
-                writer = csv.writer(outfile, lineterminator = '\n', delimiter = '|')
+                writer = csv.writer(outfile, lineterminator='\n', delimiter='|')
                 writer.writerows([[speaker, date, finnish]])
 
-    print("\n Finished with file %s"%(file))
+    print("\n Finished with file %s" % (file))
 
 # Read full data back in to split it in roughly half
-df = pd.read_csv("speeches.csv", delimiter = "|", lineterminator= "\n")
+df = pd.read_csv("speeches.csv", delimiter="|", lineterminator="\n")
 
 # Split df
 df1 = df.iloc[:50000]
@@ -134,5 +137,5 @@ df2 = df.iloc[50000:]
 print(len(df1))
 print(len(df2))
 
-df1.to_csv("speeches-1.csv", sep = "|", line_terminator = "\n")
-df2.to_csv("speeches-2.csv", sep = "|", line_terminator = "\n")
+df1.to_csv("speeches-1.csv", sep="|", line_terminator="\n")
+df2.to_csv("speeches-2.csv", sep="|", line_terminator="\n")
