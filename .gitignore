@@ -1,7 +1,12 @@
 venv
 .idea
-models/fast_text/*.bin
 models/fast_text/*.test
 models/fast_text/*.train
+
+
+notebooks/.ipynb_checkpoints/
+
+*.model
 models/word2vec/*.model
+models/fast_text/*.bin
 models/word2vec/*.npy
