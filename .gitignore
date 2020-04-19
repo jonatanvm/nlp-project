@@ -3,3 +3,5 @@ venv
 models/fast_text/*.bin
 models/fast_text/*.test
 models/fast_text/*.train
+models/word2vec/*.model
+models/word2vec/*.npy
