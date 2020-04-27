@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.manifold import TSNE
 
 
-def TSNE_scatterplot(model, word, neg_word):
+def TSNE_scatterplot(model, word, neg_word, save=False):
     close_words = np.array(model.wv.most_similar([word]))
     neg_words = np.array(model.wv.most_similar(negative=[neg_word]))
 
@@ -17,7 +17,7 @@ def TSNE_scatterplot(model, word, neg_word):
 
     x = Y[1:, 0]
     y = Y[1:, 1]
-    plt.figure(figsize=(11, 9))
+    plt.figure(figsize=(11, 4))
     plt.scatter(Y[0, 0], Y[0, 1], marker="*", c='blue', s=120)
     plt.scatter(x, y, c=color_list)
     plt.grid()
@@ -27,4 +27,5 @@ def TSNE_scatterplot(model, word, neg_word):
     for line in range(len(word_labels)):
         annotations.append(plt.text(Y[line, 0], Y[line, 1], word_labels[line].title()))
 
-    plt.title('t-SNE visualization for {}'.format(word.title()))
+    if save:
+        plt.savefig(f"{str(model)}.png", bbox_inches='tight')
