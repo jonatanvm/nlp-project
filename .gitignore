@@ -2,6 +2,7 @@ venv
 .idea
 models/fast_text/*.test
 models/fast_text/*.train
+
 output/wikipedia2008_fi_lemmatized.txt 
 
 notebooks/.ipynb_checkpoints/
