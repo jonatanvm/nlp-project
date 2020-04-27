@@ -12,3 +12,6 @@ notebooks/.ipynb_checkpoints/
 models/word2vec/*.model
 models/fast_text/*.bin
 models/word2vec/*.npy
+*.zip
+*.wikipedia2008_fi_lemmatized.txt
+*__pycache__/
