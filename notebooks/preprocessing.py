@@ -18,18 +18,17 @@ def nltk_preprocess(dataframe):
     stop = set(stopwords.words("finnish"))
     stemmer = SnowballStemmer("finnish")
 
-    def remove_parentheses(doc):
-        return re.sub(r"\([^\)]*\)", "", doc)
+    def parentheses():
+        return r"\([^\)]*\)"
 
-    def remove_commas(doc):
-        '''Remove punctuation that does not signal end of sentence:
+    def commas():
+        ''' Remove punctuation that does not signal end of sentence:
         commas, colons, semicolons, hyphens'''
-        return re.sub(r"[,:;-]", "", doc)
+        return r"[,:;-]"
 
     def cleaning(doc):
         # remove parenthetical additions
-        doc = remove_parentheses(doc)
-        doc = remove_commas(doc)
+        doc = re.sub(f"({commas()})|({parentheses()})", "", doc)
 
         txt = [stemmer.stem(token) for token in doc.split() if token not in stop and isinstance(token, str)]
         if len(txt) > 2:
@@ -55,11 +54,25 @@ def spacy_preprocess(dataframe):
         if len(text) > 2:
             return ' '.join(text)
 
-    brief_cleaning = (re.sub("^([A-Z]|Å|Ä|Ö)[a-zåäö]+$", ' ', str(row)).lower() for row in dataframe['speech'])
+    def alphabetical():
+        return "[^A-Za-z|Å|Ä|Ö|å|ä|ö]"
+
+    def titles():
+        return "([P|p]uheenjohtaja [A-Z|Å|Ä|Ö])|([M|m]inisteri [A-Z|Å|Ä|Ö])|([P|p]ääministeri [A-Z|Å|Ä|Ö])|([E|e]dustaja [A-Z|Å|Ä|Ö])"
 
     t = time()
 
-    txt = [cleaning(doc) for doc in nlp.pipe(brief_cleaning, batch_size=5000, n_threads=-1)]
+    # Remove titles
+    cleaned = []
+
+    for row in dataframe['speech']:
+        # Remove titles
+        cleaned_str = re.sub(f"({titles()})", lambda x: x.group(0).split(" ")[1], str(row))
+        # Only keep alphabetical
+        cleaned_str = re.sub(f"({alphabetical()})", ' ', cleaned_str).lower()
+        cleaned.append(cleaned_str)
+
+    txt = [cleaning(doc) for doc in nlp.pipe(cleaned, batch_size=5000, n_threads=-1)]
 
     print('Time to clean up everything: {} mins'.format(round((time() - t) / 60, 2)))
 
